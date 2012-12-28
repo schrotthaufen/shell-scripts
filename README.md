@@ -1,4 +1,4 @@
 shell-scripts
 =============
 
-Random misc. shellscripts
+Random misc. shellscripts I wrote unless stated otherwise
