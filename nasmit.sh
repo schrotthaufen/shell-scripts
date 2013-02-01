@@ -19,12 +19,10 @@ until [ "${CODE}" == "" ]; do
   read CODE
 done
 
-nasm -f bin -o /dev/stdout /tmp/nasmit.asm| \
-  xxd -c 1 | \
-  cut -d ':' -f2 | \
-  sed 's/ /\\x/g' | \
-  cut -d '\' -f-2 | \
-  tr -d '\n'
+nasm -f bin -o /dev/stdout /tmp/nasmit.asm | \
+	xxd -p | \
+	tr -d '\n' | \
+	sed -r "s/(..)/\\\\x\1/g"
 
 echo ""
 rm /tmp/nasmit.asm
