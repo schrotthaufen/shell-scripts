@@ -2,7 +2,7 @@
 # The author does not care about a license
 
 usage() {
-  echo "Usage: ${0} [-b {16|32|64}] [-f infile] [-o outfile]" 1>&2
+  echo "Usage: ${0} [-b {16|32|64}] [-f infile] [-o outfile]" >&2
 }
 
 if [ "${#}" -lt 1 ]; then
@@ -10,7 +10,8 @@ if [ "${#}" -lt 1 ]; then
 	exit 1;
 fi
 
-INFILE="/tmp/nasmit.asm"
+INFILE_DEFAULT="/tmp/nasmit.asm"
+INFILE="${INFILE_DEFAULT}"
 OUTFILE="/dev/stdout"
 
 while getopts ":b:f:o:h" opt; do
@@ -23,7 +24,7 @@ while getopts ":b:f:o:h" opt; do
 					;;
 				64) break;
 					;;
-				*) echo "Only 16, 32 or 64 are valid values" 1>&2;
+				*) echo "Only 16, 32 or 64 are valid values" >&2;
 					exit 1;
 					;;
 				esac
@@ -31,7 +32,7 @@ while getopts ":b:f:o:h" opt; do
 		f) INFILE="${OPTARG}";
 			fflag=true;
 			if [ ! -e "${INFILE}" ]; then
-				echo "File not found: ${INFILE}" 1>&2;
+				echo "File not found: ${INFILE}" >&2;
 				exit 1;
 			fi
 			;;
@@ -51,19 +52,19 @@ done
 
 shift $(( OPTIND - 1 ));
 
-if [[ "${INFILE}" == "/tmp/nasmit.asm" && ${fflag} != true ]]; then
+if [[ "${INFILE}" == "${INFILE_DEFAULT}" && ${fflag} != true ]]; then
 
-	echo "End input with empty line" 1>&2
-	echo "You will find your assemby in /tmp/nasmit.asm" 1>&2
+	echo "End input with empty line" >&2
+	echo "You will find your assemby in ${INFILE_DEFAULT}" >&2
 
-	if [ -e /tmp/nasmit.asm ]; then
-  	rm /tmp/nasmit.asm
+	if [ -e "${INFILE_DEFAULT}" ]; then
+  	rm "${INFILE_DEFAULT}"
 	fi
 
 	CODE="BITS ${BITS}"
 
 	until [ "${CODE}" == "" ]; do
-  	echo $CODE >> /tmp/nasmit.asm
+  	echo $CODE >> "${INFILE_DEFAULT}"
   	read CODE
 	done
 fi
