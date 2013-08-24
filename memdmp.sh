@@ -41,7 +41,7 @@ MEMDMP="${3}"
 DMPFILE="`basename $MEMDMP`"
 VMUSER="${4}"
 
-virsh list | grep -E '${DOM}.*running' &>/dev/null
+virsh list | grep -Ei '${DOM}.*running' &>/dev/null
 if [ $? -ne 0 ]; then
 	echo "${DOM} not running or no permissions to use virsh"
 	exit 1
