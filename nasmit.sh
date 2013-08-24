@@ -64,11 +64,21 @@ if [[ "${INFILE}" == "${INFILE_DEFAULT}" && ${fflag} != true ]]; then
 	CODE="BITS ${BITS}"
 
 	until [ "${CODE}" == "" ]; do
-  	echo $CODE >> "${INFILE_DEFAULT}"
-  	read CODE
+	 	echo $CODE >> "${INFILE_DEFAULT}"
+	 	read CODE
 	done
 fi
 
+grep BITS "${INFILE}" > /dev/null
+if [ $? -ne 0 ]; then
+	if [ -n "${BITS+x}" ]; then
+		echo "BITS ${BITS}"|cat - "${INFILE}" > "${INFILE}.fixed"
+		INFILE="${INFILE}.fixed"
+	else
+		echo "Either set BITS in your code or specify it via commandline"
+		exit 1
+	fi
+fi
 nasm -f bin -o /dev/stdout "${INFILE}" | \
 	xxd -p | \
 	tr -d '\n' | \
