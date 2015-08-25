@@ -2,7 +2,7 @@
 # The author does not care about a license
 
 usage() {
-  echo "Usage: ${0} [-b {16|32|64}] [-f infile] [-o outfile]" >&2
+  echo "Usage: ${0} [-f infile] [-o outfile] [-b {16|32|64}]" >&2
 }
 
 if [ "${#}" -lt 1 ]; then
@@ -13,6 +13,7 @@ fi
 INFILE_DEFAULT="/tmp/nasmit.asm"
 INFILE="${INFILE_DEFAULT}"
 OUTFILE="/dev/stdout"
+FFLAG=0
 
 while getopts ":b:f:o:h" opt; do
 	case "${opt}" in
@@ -30,7 +31,7 @@ while getopts ":b:f:o:h" opt; do
 				esac
 			;;
 		f) INFILE="${OPTARG}";
-			fflag=true;
+			FFLAG=1;
 			if [ ! -e "${INFILE}" ]; then
 				echo "File not found: ${INFILE}" >&2;
 				exit 1;
@@ -52,7 +53,7 @@ done
 
 shift $(( OPTIND - 1 ));
 
-if [[ "${INFILE}" == "${INFILE_DEFAULT}" && ${fflag} != true ]]; then
+if [[ "${INFILE}" == "${INFILE_DEFAULT}" && ${FFLAG} -eq 0 ]]; then
 
 	echo "End input with empty line" >&2
 	echo "You will find your assemby in ${INFILE_DEFAULT}" >&2
