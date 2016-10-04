@@ -1,34 +1,32 @@
 #!/bin/bash
 
 if [ "$#" -lt 2 ]; then
-	echo "Usage: ${0} <host:port> <new fingerprint> [smtps]"
+	echo -e "Usage: ${0} <host:port> <fingerprint> [extra openssl args]\n" \
+		"i.e. ${0} <host:port> <fingerprint> -starttls smtp"
+	exit
 fi
 
-SSH_SERVERS=("srv1" "srv2" ... "srvN")
+SSH_SERVERS=("nb" "nv" "bastelfreak" "anapnea")
 fps=()
 dest="${1}"
 newfp="${2}"
-issmtp="${3}"
+EXTRA_ARGS="${@:3}"
+echo "${EXTRA_ARGS}"
 matches=0
 mismatches=0
 matchcolor=$(echo -e "\e[32m")
 mismatchcolor=$(echo -e "\e[1;31m")
-EXTRA_ARGS="-starttls smtp"
 
 # args: SSH_SERVER TLS_HOST <whatever for smtp>
 function connect {
 	echo $(ssh -n "${1}" \
-		openssl s_client -connect ${2} ${3} 2>/dev/null| \
+		openssl s_client -connect "${2}" "${@:3}" 2>/dev/null| \
 		openssl x509 -fingerprint -noout | \
 		cut -d '=' -f 2)
 }
 
 for((i=0; i<${#SSH_SERVERS[@]}; ++i)); do
-	if [ -n "${issmtp+x}" ]; then
-		fp=$(connect "${SSH_SERVERS[$i]}" "${dest}" "${EXTRA_ARGS}")
-	else
-		fp=$(connect "${SSH_SERVERS[$i]}" "${dest}")
-	fi
+	fp=$(connect "${SSH_SERVERS[$i]}" "${dest}" "${EXTRA_ARGS}")
 
 	fps=("${fps[@]}" "${fp}")
 	diff <(echo ${fp}) <(echo ${newfp}) > /dev/null
