@@ -15,15 +15,15 @@ INFILE="${INFILE_DEFAULT}"
 OUTFILE="/dev/stdout"
 FFLAG=0
 
-while getopts ":b:f:o:h" opt; do
+while getopts "hxb:f:o:" opt; do
 	case "${opt}" in
 		b) BITS="${OPTARG}";
 			case "${BITS}" in
-				16) break;
+				16) continue;
 					;;
-				32) break;
+				32) continue;
 					;;
-				64) break;
+				64) continue;
 					;;
 				*) echo "Only 16, 32 or 64 are valid values" >&2;
 					exit 1;
