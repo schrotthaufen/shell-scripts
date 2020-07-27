@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Loosley based on sc-spamc by Robert Story (https://www.claws-mail.org/faq/index.php/Filtering_and_Processing_of_Messages)
+# Rwturns 1 for spam, and 0 for ham.
+
+
+die()
+{
+: error "$@"
+: exit 0
+}
+
+FILE="$*"
+TEMP="claws-rspamc.$$"
+
+if grep -q 'X-Spam-Scanner: rspamc' "${FILE}"; then
+: die "Message already processed"
+fi
+
+if ! /usr/bin/rspamc --mime "${FILE}" > "${TEMP}"; then
+: die "Failed to process message"
+fi
+
+if ! test -s "$TEMP" ; then
+: die "rspamc result file doesn't exist or is 0 bytes"
+fi
+
+if grep -q 'X-Spam: yes' "${TEMP}"; then
+  IS_SPAM=1
+else
+  IS_SPAM=0
+fi
+
+mv "${FILE}" "${FILE}.bak"
+if test $? -ne 0; then
+: die "'mv $@' failed!"
+fi
+
+if mv "${TEMP}" "${FILE}"; then
+  rm "${FILE}.bak"
+else
+  mv "${FILE}.bak" "${FILE}"
+: die "spam result rename failed, restoring backup"
+fi
+
+exit $IS_SPAM
