@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# The author does not care about a license
-
 usage() {
 	echo "Usage: ${0} [-f infile] [-o outfile] [-b {16|32|64}] [-x]" >&2
 	echo -e "\t-x: prefix each byte with \\x (requires sed)" >&2
